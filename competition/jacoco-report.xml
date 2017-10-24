@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:jacoco="antlib:org.jacoco.ant" basedir="." name="Ant Jacoco Report" default="report">
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="jacocoant.jar" />
+	</taskdef>
+	<!-- <target name="coverage">
+		<jacoco:coverage>
+			<junit fork="true" forkmode="once">
+				<test name="org.jacoco.examples.HelloJaCoCoTest" />
+				<classpath>
+					<pathelement location="./bin" />
+				</classpath>
+			</junit>
+		</jacoco:coverage>
+	</target> -->
+	<target name="report">
+		<!-- Step 3: Create coverage report -->
+		<jacoco:report>
+			<!-- This task needs the collected execution data and ... -->
+			<executiondata>
+				<file file="jacoco.exec" />
+			</executiondata>
+			<!-- the class files and optional source files ... -->
+			<structure name="Test Report">
+				<classfiles>
+					<!-- <fileset dir="."> -->
+					<zipfileset src="Tutorial_Stack.jar" includes="**/tutorial/Stack.class"/> <!-- prefix="tutorial" -->
+					<!-- </fileset> -->
+				</classfiles>
+			</structure>
+			<!-- to produce reports in different formats. -->
+			<html destdir="report" />
+			<!-- <csv destfile="report/report.csv" /> -->
+			<!-- <xml destfile="report/report.xml" /> -->
+		</jacoco:report>
+	</target>
+</project>
