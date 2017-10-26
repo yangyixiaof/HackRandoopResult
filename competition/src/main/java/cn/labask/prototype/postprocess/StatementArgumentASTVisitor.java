@@ -3,7 +3,6 @@ package cn.labask.prototype.postprocess;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
@@ -50,21 +49,23 @@ public class StatementArgumentASTVisitor extends ASTVisitor {
 				String arg_cnt = arg.toString().trim();
 				
 				// testing.
-				System.err.println(arg_cnt + "#" + NumericUtil.IsPrmitive(arg_cnt));
-				
-				if (NumericUtil.IsPrmitive(arg_cnt)) {
-					arg_count++;
-					SimpleName s = ast.newSimpleName("x" + arg_count);
-					rewrite.replace(arg, s, null);
-					String pre = "(";
-					if (first) {
-						first = false;
-					} else {
-						pre = ",";
+				System.err.println(arg_cnt + "# NumericUtil.IsPrmitive #" + NumericUtil.IsPrmitive(arg_cnt) + "#" + arg.resolveConstantExpressionValue());
+				String itb_qualified = itb.getQualifiedName();
+				if (itb_qualified.equals("boolean") || itb_qualified.equals("byte") || itb_qualified.equals("short") || itb_qualified.equals("int") || itb_qualified.equals("long") || itb_qualified.equals("float") || itb_qualified.equals("double")  || itb_qualified.equals("java.lang.Boolean") || itb_qualified.equals("java.lang.Byte") || itb_qualified.equals("java.lang.Short") || itb_qualified.equals("java.lang.Integer") || itb_qualified.equals("java.lang.Long") || itb_qualified.equals("java.lang.Float") || itb_qualified.equals("java.lang.Double")) {
+					if (NumericUtil.IsPrmitive(arg)) {
+						arg_count++;
+						SimpleName s = ast.newSimpleName("x" + arg_count);
+						rewrite.replace(arg, s, null);
+						String pre = "(";
+						if (first) {
+							first = false;
+						} else {
+							pre = ",";
+						}
+						declare_func_name.append(pre + itb.getQualifiedName() + " " + s.toString());
+						invoke.append(pre + arg_cnt);
+						config.append(pre + s.toString() + ":" + itb.getQualifiedName());
 					}
-					declare_func_name.append(pre + itb.getQualifiedName() + " " + s.toString());
-					invoke.append(pre + arg_cnt);
-					config.append(pre + s.toString() + ":" + itb.getQualifiedName());
 				}
 				index++;
 			}
