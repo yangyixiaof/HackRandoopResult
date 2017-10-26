@@ -95,7 +95,7 @@ public class PostProcessRandoop {
 			}
 			build.append(line_sep);
 			for (String field : fields) {
-				build.append(field + " ");
+				build.append(field.trim() + " ");
 			}
 			build.append(line_sep);
 			Iterator<String> wm_itr = wrap_methods.iterator();
