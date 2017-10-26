@@ -93,6 +93,7 @@ public class PostProcessRandoop {
 			for (String impt : imports) {
 				build.append("import " + impt.trim() + "; ");
 			}
+			build.append(line_sep);
 			for (String field : fields) {
 				build.append(field + " ");
 			}
