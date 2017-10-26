@@ -40,7 +40,7 @@ public class PostProcessRandoop {
 			for (File f : files) {
 				if (f.getName().endsWith(".java")) {
 					String content = FileUtil.ReadFromFile(f);
-					OneJavaFileProcessResult oresult = ParseAndModify(content, index);
+					OneJavaFileProcessResult oresult = ParseAndModify(f.getName(), content, index);
 					index = oresult.GetIndex();
 					imports.addAll(oresult.GetImports());
 					fields.addAll(oresult.GetFields());
@@ -113,16 +113,22 @@ public class PostProcessRandoop {
 		}
 	}
 
-	private OneJavaFileProcessResult ParseAndModify(String content, int index) {
+	private OneJavaFileProcessResult ParseAndModify(String unit_name, String content, int index) {
 		ASTParser parser = ASTParser.newParser(AST.JLS8);
+		parser.setResolveBindings(true);
+		parser.setBindingsRecovery(true);
 		Map<String, String> options = JavaCore.getOptions();
 		options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
 		parser.setCompilerOptions(options);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		String[] classpath_entries = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
 		parser.setEnvironment(classpath_entries, null, null, true);
+		parser.setUnitName(unit_name);
 		parser.setSource(content.toCharArray());
 		CompilationUnit compilationUnit = (CompilationUnit) parser.createAST(null);
+		if (compilationUnit.getAST().hasBindingsRecovery()) {
+			System.out.println("Binding activated.");
+		}
 		ExtractMethodASTVisitor dastv = new ExtractMethodASTVisitor(index, content, compilationUnit);
 		compilationUnit.accept(dastv);
 		return new OneJavaFileProcessResult(dastv.GetTestIndex(), dastv.GetImports(), dastv.GetFields(), dastv.GetFilteredMethods(), dastv.GetWrapMethods(), dastv.GetWrapMethodsInvokes(), dastv.GetWrapMethodsConfigs());

@@ -87,20 +87,22 @@ public class ExtractMethodASTVisitor extends ASTVisitor {
 				ASTRewrite rewrite = ASTRewrite.create(ast);
 				StatementArgumentASTVisitor saav = new StatementArgumentASTVisitor(ast, rewrite, node, test_name);
 				node.accept(saav);
-				String content = ASTRewriteHelper.GetRewriteContent(node, rewrite, cu_resource, cu);
-				String real_content = saav.GetFunctionName() + content.substring(content.indexOf('{'));
-				BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(real_content.getBytes())));
-				StringBuilder real_content_builder = new StringBuilder("");
-				try {
-					String r_cnt = null;
-					while ((r_cnt = br.readLine()) != null) {
-						real_content_builder.append(r_cnt + " ");
+				if (saav.NeedJdartExecution()) {
+					String content = ASTRewriteHelper.GetRewriteContent(node, rewrite, cu_resource, cu);
+					String real_content = saav.GetFunctionName() + content.substring(content.indexOf('{'));
+					BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(real_content.getBytes())));
+					StringBuilder real_content_builder = new StringBuilder("");
+					try {
+						String r_cnt = null;
+						while ((r_cnt = br.readLine()) != null) {
+							real_content_builder.append(r_cnt + " ");
+						}
+					} catch (Exception e) {
 					}
-				} catch (Exception e) {
+					wrap_methods.add(real_content_builder.toString());
+					wrap_methods_invokes.add(saav.GetInvoke());
+					wrap_methods_configs.add(saav.GetConfig());
 				}
-				wrap_methods.add(real_content_builder.toString());
-				wrap_methods_invokes.add(saav.GetInvoke());
-				wrap_methods_configs.add(saav.GetConfig());
 			}
 		}
 		return super.visit(node);
