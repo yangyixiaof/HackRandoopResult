@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -20,7 +21,7 @@ public class StatementArgumentASTVisitor extends ASTVisitor {
 	AST ast = null;
 	ASTRewrite rewrite = null;
 	MethodDeclaration node = null;
-	boolean first = false;
+	boolean first = true;
 	
 	StringBuilder declare_func_name = new StringBuilder("public static void ");
 	StringBuilder invoke = new StringBuilder("");
@@ -38,16 +39,19 @@ public class StatementArgumentASTVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodInvocation node) {
 		IMethodBinding nbinding = node.resolveMethodBinding();
-		System.err.println(nbinding);
+		// System.err.println(nbinding);
 		if (nbinding != null && node.arguments() != null && node.arguments().size() > 0) {
 			ITypeBinding[] it_args = nbinding.getParameterTypes();
 			int index = 0;
 			@SuppressWarnings("unchecked")
-			List<ASTNode> args = (List<ASTNode>)node.arguments();
-			for (ASTNode arg : args) {
+			List<Expression> args = (List<Expression>)node.arguments();
+			for (Expression arg : args) {
 				ITypeBinding itb = it_args[index];
 				String arg_cnt = arg.toString().trim();
-				System.err.println(arg_cnt);
+				
+				// testing.
+				System.err.println(arg_cnt + "#" + NumericUtil.IsPrmitive(arg_cnt));
+				
 				if (NumericUtil.IsPrmitive(arg_cnt)) {
 					arg_count++;
 					SimpleName s = ast.newSimpleName("x" + arg_count);
