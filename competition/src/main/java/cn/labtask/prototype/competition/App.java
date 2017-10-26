@@ -15,7 +15,7 @@ public class App {
     	if (args.length == 0) {
     		return;
     	}
-    	if (args.length == 2) {
+    	if (args.length >= 2) {
     		App.handle_jdart_input = true;
     	}
         System.out.println("Transformation running!");
