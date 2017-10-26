@@ -2,7 +2,6 @@ package cn.labask.prototype.postprocess;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -12,6 +11,8 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+
+import cn.labask.prototype.util.NumericUtil;
 
 public class StatementArgumentASTVisitor extends ASTVisitor {
 	
@@ -47,7 +48,7 @@ public class StatementArgumentASTVisitor extends ASTVisitor {
 				ITypeBinding itb = it_args[index];
 				String arg_cnt = arg.toString().trim();
 				System.err.println(arg_cnt);
-				if (StringUtils.isNumeric(arg_cnt) || arg_cnt.equals("true") || arg_cnt.equals("false")) {
+				if (NumericUtil.IsPrmitive(arg_cnt)) {
 					arg_count++;
 					SimpleName s = ast.newSimpleName("x" + arg_count);
 					rewrite.replace(arg, s, null);
