@@ -3,6 +3,7 @@ package cn.labask.prototype.postprocess;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,9 @@ public class PostProcessRandoop {
 		Set<String> imports = new HashSet<String>();
 		Set<String> fields = new HashSet<String>();
 		List<String> methods = new LinkedList<String>();
+		List<String> wrap_methods = new LinkedList<String>();
+		List<String> wrap_methods_invokes = new LinkedList<String>();
+		List<String> wrap_methods_configs = new LinkedList<String>();
 		File dir = new File(work_dir);
 		if (dir.exists()) {
 			File[] files = dir.listFiles();
@@ -41,6 +45,9 @@ public class PostProcessRandoop {
 					imports.addAll(oresult.GetImports());
 					fields.addAll(oresult.GetFields());
 					methods.addAll(oresult.GetMethods());
+					wrap_methods.addAll(oresult.GetWrapMethods());
+					wrap_methods_invokes.addAll(oresult.GetWrapMethodsInvokes());
+					wrap_methods_configs.addAll(oresult.GetWrapMethodsConfigs());
 				}
 			}
 		}
@@ -79,6 +86,31 @@ public class PostProcessRandoop {
 			fw.close();
 		} catch (Exception e) {
 		}
+		
+		try {
+			String line_sep = System.getProperty("line.separator");
+			StringBuilder build = new StringBuilder("");
+			for (String impt : imports) {
+				build.append("import " + impt.trim() + ";#");
+			}
+			build.append(line_sep);
+			Iterator<String> wm_itr = wrap_methods.iterator();
+			Iterator<String> wmi_itr = wrap_methods_invokes.iterator();
+			Iterator<String> wmc_itr = wrap_methods_configs.iterator();
+			while (wm_itr.hasNext()) {
+				String wm = wm_itr.next();
+				build.append(wm + line_sep);
+				String wmi = wmi_itr.next();
+				build.append(wmi + line_sep);
+				String wmc = wmc_itr.next();
+				build.append(wmc + line_sep);
+			}
+			String jdart_content = build.toString();
+			FileWriter fw = new FileWriter(new File("JDart_Run.txt"));
+			fw.write(jdart_content);
+			fw.close();
+		} catch (Exception e) {
+		}
 	}
 
 	private OneJavaFileProcessResult ParseAndModify(String content, int index) {
@@ -87,11 +119,13 @@ public class PostProcessRandoop {
 		options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
 		parser.setCompilerOptions(options);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+		String[] classpath_entries = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
+		parser.setEnvironment(classpath_entries, null, null, true);
 		parser.setSource(content.toCharArray());
 		CompilationUnit compilationUnit = (CompilationUnit) parser.createAST(null);
 		ExtractMethodASTVisitor dastv = new ExtractMethodASTVisitor(index, content, compilationUnit);
 		compilationUnit.accept(dastv);
-		return new OneJavaFileProcessResult(dastv.GetTestIndex(), dastv.GetImports(), dastv.GetFields(), dastv.GetFilteredMethods());
+		return new OneJavaFileProcessResult(dastv.GetTestIndex(), dastv.GetImports(), dastv.GetFields(), dastv.GetFilteredMethods(), dastv.GetWrapMethods(), dastv.GetWrapMethodsInvokes(), dastv.GetWrapMethodsConfigs());
 	}
 
 }
@@ -102,12 +136,18 @@ class OneJavaFileProcessResult {
 	private Set<String> imports = null;
 	private Set<String> fields = null;
 	private List<String> methods = null;
+	private List<String> wrap_methods = new LinkedList<String>();
+	private List<String> wrap_methods_invokes = new LinkedList<String>();
+	private List<String> wrap_methods_configs = new LinkedList<String>();
 
-	public OneJavaFileProcessResult(int index, Set<String> imports, Set<String> fields, List<String> methods) {
+	public OneJavaFileProcessResult(int index, Set<String> imports, Set<String> fields, List<String> methods, List<String> wrap_methods, List<String> wrap_methods_invokes, List<String> wrap_methods_configs) {
 		this.index = index;
 		this.imports = imports;
 		this.fields = fields;
 		this.methods = methods;
+		this.wrap_methods = wrap_methods;
+		this.wrap_methods_invokes = wrap_methods_invokes;
+		this.wrap_methods_configs = wrap_methods_configs;
 	}
 
 	public int GetIndex() {
@@ -124,6 +164,18 @@ class OneJavaFileProcessResult {
 	
 	public List<String> GetMethods() {
 		return methods;
+	}
+	
+	public List<String> GetWrapMethods() {
+		return wrap_methods;
+	}
+	
+	public List<String> GetWrapMethodsInvokes() {
+		return wrap_methods_invokes;
+	}
+	
+	public List<String> GetWrapMethodsConfigs() {
+		return wrap_methods_configs;
 	}
 
 }
