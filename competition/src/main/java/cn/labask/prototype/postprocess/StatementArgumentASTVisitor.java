@@ -30,6 +30,7 @@ public class StatementArgumentASTVisitor extends ASTVisitor {
 		this.ast = ast;
 		this.rewrite = rewrite;
 		this.node = node;
+		func_name = "f_" + func_name;
 		declare_func_name.append(func_name);
 		invoke.append(func_name);
 		config.append(func_name);
@@ -49,7 +50,8 @@ public class StatementArgumentASTVisitor extends ASTVisitor {
 				String arg_cnt = arg.toString().trim();
 				
 				// testing.
-				System.err.println(arg_cnt + "# NumericUtil.IsPrmitive #" + NumericUtil.IsPrmitive(arg_cnt) + "#" + arg.resolveConstantExpressionValue());
+				// System.err.println(arg_cnt + "# NumericUtil.IsPrmitive #" + NumericUtil.IsPrmitive(arg_cnt) + "#" + arg.resolveConstantExpressionValue());
+				
 				String itb_qualified = itb.getQualifiedName();
 				if (itb_qualified.equals("boolean") || itb_qualified.equals("byte") || itb_qualified.equals("short") || itb_qualified.equals("int") || itb_qualified.equals("long") || itb_qualified.equals("float") || itb_qualified.equals("double")  || itb_qualified.equals("java.lang.Boolean") || itb_qualified.equals("java.lang.Byte") || itb_qualified.equals("java.lang.Short") || itb_qualified.equals("java.lang.Integer") || itb_qualified.equals("java.lang.Long") || itb_qualified.equals("java.lang.Float") || itb_qualified.equals("java.lang.Double")) {
 					if (NumericUtil.IsPrmitive(arg)) {
@@ -62,9 +64,9 @@ public class StatementArgumentASTVisitor extends ASTVisitor {
 						} else {
 							pre = ",";
 						}
-						declare_func_name.append(pre + itb.getQualifiedName() + " " + s.toString());
+						declare_func_name.append(pre + itb_qualified + " " + s.toString());
 						invoke.append(pre + arg_cnt);
-						config.append(pre + s.toString() + ":" + itb.getQualifiedName());
+						config.append(pre + s.toString() + ":" + itb_qualified);
 					}
 				}
 				index++;

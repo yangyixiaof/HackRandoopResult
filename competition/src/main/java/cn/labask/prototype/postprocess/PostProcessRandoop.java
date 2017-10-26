@@ -91,7 +91,7 @@ public class PostProcessRandoop {
 			String line_sep = System.getProperty("line.separator");
 			StringBuilder build = new StringBuilder("");
 			for (String impt : imports) {
-				build.append("import " + impt.trim() + ";#");
+				build.append("import " + impt.trim() + "; ");
 			}
 			build.append(line_sep);
 			Iterator<String> wm_itr = wrap_methods.iterator();

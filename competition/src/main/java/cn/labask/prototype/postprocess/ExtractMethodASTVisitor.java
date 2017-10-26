@@ -95,7 +95,7 @@ public class ExtractMethodASTVisitor extends ASTVisitor {
 					try {
 						String r_cnt = null;
 						while ((r_cnt = br.readLine()) != null) {
-							real_content_builder.append(r_cnt + " ");
+							real_content_builder.append(r_cnt.trim() + " ");
 						}
 					} catch (Exception e) {
 					}
