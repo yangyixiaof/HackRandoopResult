@@ -81,7 +81,8 @@ public class ExtractMethodASTVisitor extends ASTVisitor {
 				String content = ASTRewriteHelper.GetRewriteContent(node, rewrite, cu_resource, cu);
 				methods.add(content);
 			}
-			if (App.handle_jdart_input && rand <= rate_threshold) {
+			double jdart_rand = Math.random();
+			if (App.handle_jdart_input && jdart_rand <= rate_threshold) {
 				AST ast = node.getAST();
 				ASTRewrite rewrite = ASTRewrite.create(ast);
 				StatementArgumentASTVisitor saav = new StatementArgumentASTVisitor(ast, rewrite, node, test_name);

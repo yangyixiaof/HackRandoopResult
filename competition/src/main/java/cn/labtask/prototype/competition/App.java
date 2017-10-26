@@ -18,7 +18,9 @@ public class App {
     	if (args.length == 2) {
     		App.handle_jdart_input = true;
     	}
-        // System.out.println( "Hello World!" );
+        System.out.println("Transformation running!");
+        System.out.println("Test Directory:" + args[0]);
+        System.out.println("App.handle_jdart_input:" + App.handle_jdart_input);
         PostProcessRandoop ppr = new PostProcessRandoop();
         ppr.ExtractAndCombineIntoOne(args[0]);
     }
