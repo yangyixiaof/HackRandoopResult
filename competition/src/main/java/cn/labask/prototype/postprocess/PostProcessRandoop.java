@@ -51,6 +51,10 @@ public class PostProcessRandoop {
 				}
 			}
 		}
+		else {
+			System.out.printf("指定的待合并用例来源目录 %s 不存在，请检查。\n",work_dir);
+		}
+		
 		try {
 			String line_sep = System.getProperty("line.separator");
 			StringBuilder build = new StringBuilder("");
@@ -85,6 +89,7 @@ public class PostProcessRandoop {
 			fw.write(changed_class);
 			fw.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		try {
@@ -114,6 +119,7 @@ public class PostProcessRandoop {
 			fw.write(jdart_content);
 			fw.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -131,7 +137,7 @@ public class PostProcessRandoop {
 		parser.setSource(content.toCharArray());
 		CompilationUnit compilationUnit = (CompilationUnit) parser.createAST(null);
 		if (compilationUnit.getAST().hasBindingsRecovery()) {
-			System.out.println("Binding activated.");
+			System.out.printf("Binding activated for compilation unit %s.\n",unit_name);
 		}
 		ExtractMethodASTVisitor dastv = new ExtractMethodASTVisitor(index, content, compilationUnit);
 		compilationUnit.accept(dastv);

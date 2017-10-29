@@ -67,17 +67,25 @@ public class ExtractMethodASTVisitor extends ASTVisitor {
 		// testing.
 		// System.err.println("MethodDeclaration:" + node);
 		
-		double rand = Math.random();
-		if (rand >= 0.5) {
+//		double rand = Math.random();
+//		if (rand >= 0.5) {
 			ASTNode method_name_node = node.getName();
 			String method_name = method_name_node.toString();
 			String test_name = "test" + test_index;
+			// 若一个 method 是 JUnit 测试用例，则改方法名后 copy 过来
 			if (method_name.startsWith("test")) {
 				AST ast = node.getAST();
 				ASTRewrite rewrite = ASTRewrite.create(ast);
 				SimpleName new_method_name_node = ast.newSimpleName(test_name);
 				test_index++;
 				rewrite.replace(method_name_node, new_method_name_node, null);
+				String content = ASTRewriteHelper.GetRewriteContent(node, rewrite, cu_resource, cu);
+				methods.add(content);
+			}else if(method_name.startsWith("f_")) {
+				// 若一个 method 是「提取参数、包装送给 JDart 的」，则原样 copy 过来
+				AST ast = node.getAST();
+				ASTRewrite rewrite = ASTRewrite.create(ast); // 是不是可以不经过 rewrite 了…… 但是不知道怎么从 AST 获得 content，问箫 TODO
+				rewrite.replace(method_name_node, method_name_node, null); // 玄学疗法：能 fix 第二个文件里的 f_test44 copy 不过来的 bug
 				String content = ASTRewriteHelper.GetRewriteContent(node, rewrite, cu_resource, cu);
 				methods.add(content);
 			}
@@ -104,7 +112,7 @@ public class ExtractMethodASTVisitor extends ASTVisitor {
 					wrap_methods_configs.add(saav.GetConfig());
 				}
 			}
-		}
+//		}
 		return super.visit(node);
 	}
 
