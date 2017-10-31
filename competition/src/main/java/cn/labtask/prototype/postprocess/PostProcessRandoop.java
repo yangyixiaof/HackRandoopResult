@@ -108,13 +108,15 @@ public class PostProcessRandoop {
 			Iterator<String> wmi_itr = wrap_methods_invokes.iterator();
 			Iterator<String> wmc_itr = wrap_methods_configs.iterator();
 			while (wm_itr.hasNext() && App.jdartMethodAlready < App.JDART_METHOD_THRESHOLD) {
-				App.jdartMethodAlready++;
 				String wm = wm_itr.next();
-				build.append(wm + line_sep);
 				String wmi = wmi_itr.next();
-				build.append(wmi + line_sep);
 				String wmc = wmc_itr.next();
-				build.append(wmc + line_sep);
+				if(isGoodMethod(wmc)) { // 过滤 short, byte, float, char. 过滤了影响能力，不过滤没法编译。
+					App.jdartMethodAlready++;
+					build.append(wm + line_sep);
+					build.append(wmi + line_sep);
+					build.append(wmc + line_sep);
+				}
 			}
 			String jdart_content = build.toString();
 			FileWriter fw = new FileWriter(new File(App.targetFile));
@@ -123,6 +125,10 @@ public class PostProcessRandoop {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private boolean isGoodMethod(String methodJdartConfigLine) {
+		return !(methodJdartConfigLine.contains("short") || methodJdartConfigLine.contains("byte") || methodJdartConfigLine.contains("float") || methodJdartConfigLine.contains("char"));
 	}
 
 	private OneJavaFileProcessResult ParseAndModify(String unit_name, String content, int index) {
